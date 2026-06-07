@@ -4,7 +4,7 @@
 
 @{
     Layout = "~/Views/Shared/Layouts/_DummyToolLayout.cshtml";
-    var toolResolver = ServiceLocator.Current.GetInstance<IFormToolResolver>();
+    var toolResolver = ServiceLocator.Current.GetInstance<IDummyFormToolResolver>();
     var formTool = toolResolver.Resolve(Model.CurrentPage);
 }
 

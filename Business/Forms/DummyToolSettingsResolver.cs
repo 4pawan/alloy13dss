@@ -2,7 +2,7 @@ using alloy13dss.Models.Pages;
 
 namespace alloy13dss.Business.Forms;
 
-public class ToolSettingsResolver(IContentLoader contentLoader) : IToolSettingsResolver
+public class DummyToolSettingsResolver(IContentLoader contentLoader) : IDummyToolSettingsResolver
 {
     public SettingsPage Resolve(DummySitePageData page)
     {
@@ -26,7 +26,7 @@ public class ToolSettingsResolver(IContentLoader contentLoader) : IToolSettingsR
 
         while (current != null)
         {
-            if (current is RootFolder rootFolder &&
+            if (current is DummyRootFolder rootFolder &&
                 TryResolveSettingsPage(rootFolder.SettingsPageLink, out var settingsPage))
             {
                 return settingsPage;

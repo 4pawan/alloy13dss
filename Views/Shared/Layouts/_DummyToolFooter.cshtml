@@ -1,11 +1,11 @@
-@model IPageViewModel<SitePageData>
+@model SettingsPage
 
 <footer class="dummy-theme__footer">
     <span>Dummy Tools</span>
-    @if (Model.Layout.FooterLinks?.Any() == true)
+    @if (Model?.FooterLinks?.Any() == true)
     {
         <nav class="dummy-theme__nav" aria-label="Footer links">
-            @foreach (var link in Model.Layout.FooterLinks)
+            @foreach (var link in Model.FooterLinks)
             {
                 <a href="@link.Href" title="@link.Title" target="@link.Target">@link.Text</a>
             }

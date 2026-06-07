@@ -4,7 +4,7 @@ using alloy13dss.Business.Rendering;
 namespace alloy13dss.Models.Pages;
 
 /// <summary>
-/// Root container for a reusable tool section. Child pages inherit settings from this page.
+/// Root container for a reusable dummy tool section. Child pages inherit settings from this page.
 /// </summary>
 [SiteContentType(
     DisplayName = "Root folder",
@@ -12,7 +12,7 @@ namespace alloy13dss.Models.Pages;
     GUID = "8F4C3A7F-3434-4DB9-8DB7-5F7E7A6C7581",
     GroupName = Globals.GroupNames.Specialized)]
 [SiteImageUrl]
-public class RootFolder : SitePageData, IContainerPage
+public class DummyRootFolder : SitePageData, IContainerPage
 {
     [Display(
         Name = "Settings page",

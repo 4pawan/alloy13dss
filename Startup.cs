@@ -31,13 +31,7 @@ public class Startup(IWebHostEnvironment webHostingEnvironment)
 
         // Required by Wangkanai.Detection
         services.AddDetection();
-        services.AddSingleton<IDummyFormJourneyStateRepository, DummyFormJourneyStateRepository>();
-        services.AddSingleton<IDummyFormBranchEvaluator, DummyFormBranchEvaluator>();
-        services.AddTransient<IDummyFormSubmissionAnswerStore, DummyFormSubmissionAnswerStore>();
-        services.AddTransient<IDummyFormJourneyService, DummyFormJourneyService>();
-        services.AddTransient<IToolSettingsResolver, ToolSettingsResolver>();
-        services.AddTransient<IFormToolResolver, FormToolResolver>();
-        services.AddHttpClient<IRecaptchaV3Verifier, RecaptchaV3Verifier>();
+        services.AddDummyForms();
 
         services.AddSession(options =>
         {

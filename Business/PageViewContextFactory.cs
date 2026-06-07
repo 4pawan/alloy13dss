@@ -1,6 +1,5 @@
 using alloy13dss.Models.Pages;
 using alloy13dss.Models.ViewModels;
-using alloy13dss.Business.Forms;
 using EPiServer.Data;
 using EPiServer.ServiceLocation;
 using EPiServer.SpecializedProperties;
@@ -15,7 +14,6 @@ namespace alloy13dss.Business;
 [ServiceConfiguration]
 public class PageViewContextFactory(
     IContentLoader contentLoader,
-    IToolSettingsResolver toolSettingsResolver,
     UrlResolver urlResolver,
     IDatabaseMode databaseMode,
     IOptionsMonitor<CookieAuthenticationOptions> optionMonitor)
@@ -34,8 +32,6 @@ public class PageViewContextFactory(
         }
 
         var startPage = contentLoader.Get<StartPage>(startPageContentLink);
-        var settingsPage = toolSettingsResolver.Resolve(currentContentLink);
-
         return new LayoutModel
         {
             Logotype = startPage.SiteLogotype,
@@ -44,8 +40,7 @@ public class PageViewContextFactory(
             CompanyInformationPages = startPage.CompanyInformationPageLinks,
             NewsPages = startPage.NewsPageLinks,
             CustomerZonePages = startPage.CustomerZonePageLinks,
-            FooterLinks = settingsPage?.FooterLinks ?? new LinkItemCollection(),
-            GtmScript = settingsPage?.GtmScript,
+            FooterLinks = new LinkItemCollection(),
             LoggedIn = httpContext.User.Identity.IsAuthenticated,
             LoginUrl = new HtmlString(GetLoginUrl(currentContentLink)),
             SearchActionUrl = new HtmlString(UrlResolver.Current.GetUrl(startPage.SearchPageLink)),

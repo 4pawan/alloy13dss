@@ -1,12 +1,12 @@
-using alloy13dss.Models.Forms;
 using alloy13dss.Models.Blocks;
+using alloy13dss.Models.Forms;
 using alloy13dss.Models.Pages;
 
 namespace alloy13dss.Business.Forms;
 
-public class FormToolResolver(
+public class DummyFormToolResolver(
     IContentLoader contentLoader,
-    IToolSettingsResolver toolSettingsResolver) : IFormToolResolver
+    IDummyToolSettingsResolver dummyToolSettingsResolver) : IDummyFormToolResolver
 {
     public DummyFormContainerBlock Resolve(DummySitePageData page)
     {
@@ -21,7 +21,7 @@ public class FormToolResolver(
             return directForm;
         }
 
-        var settingsPage = toolSettingsResolver.Resolve(page);
+        var settingsPage = dummyToolSettingsResolver.Resolve(page);
 
         if (settingsPage == null || string.IsNullOrWhiteSpace(page.FormToolKey))
         {

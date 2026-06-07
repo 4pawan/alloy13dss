@@ -1,16 +1,65 @@
 @model IPageViewModel<SitePageData>
+@using alloy13dss.Business.Forms
+@using EPiServer.Framework.Web.Mvc.Html
+@using EPiServer.ServiceLocation
 
 @{
-    Layout = "~/Views/Shared/Layouts/_Root.cshtml";
+    Layout = null;
+    var dummyToolSettingsResolver = ServiceLocator.Current.GetInstance<IDummyToolSettingsResolver>();
+    var dummySettingsPage = dummyToolSettingsResolver.Resolve(Model.CurrentPage.ContentLink);
 }
 
-<div class="dummy-theme">
-    @await Html.PartialAsync("~/Views/Shared/Layouts/_DummyToolHeader.cshtml", Model)
-    <main class="dummy-theme__main">
-        @RenderBody()
-    </main>
-    @await Html.PartialAsync("~/Views/Shared/Layouts/_DummyToolFooter.cshtml", Model)
-</div>
+<!DOCTYPE html>
+<html lang="@(Model.CurrentPage.Language)">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=10" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@Model.CurrentPage.MetaTitle</title>
+    @if (Model.CurrentPage.MetaKeywords != null && Model.CurrentPage.MetaKeywords.Count > 0)
+    {
+        <meta name="keywords" content="@string.Join(",", Model.CurrentPage.MetaKeywords)" />
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.CurrentPage.MetaDescription))
+    {
+        <meta name="description" content="@Model.CurrentPage.MetaDescription" />
+    }
+    @Html.CanonicalLink()
+    @Html.AlternateLinks()
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/style.min.css" />
+    <link rel="stylesheet" href="~/css/theme.min.css" />
+    <link rel="shortcut icon" href="~/favicon.ico" type="image/x-icon" />
+    <required-client-resources area="Header" />
+    @if (!string.IsNullOrWhiteSpace(dummySettingsPage?.GtmScript))
+    {
+        @Html.Raw(dummySettingsPage.GtmScript)
+    }
+</head>
+
+<body>
+    @if (Model.Layout?.IsInReadonlyMode == true)
+    {
+        await Html.RenderPartialAsync("Readonly", Model);
+    }
+
+    @await Html.RenderEPiServerQuickNavigatorAsync()
+    @Html.FullRefreshPropertiesMetaData()
+
+    <div class="container">
+        <div class="dummy-theme">
+            @await Html.PartialAsync("~/Views/Shared/Layouts/_DummyToolHeader.cshtml", Model)
+            <main class="dummy-theme__main">
+                @RenderBody()
+            </main>
+            @await Html.PartialAsync("~/Views/Shared/Layouts/_DummyToolFooter.cshtml", dummySettingsPage)
+        </div>
+    </div>
+
+    <required-client-resources area="Footer" />
+    <script src="~/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 
 <style>
     .dummy-theme {

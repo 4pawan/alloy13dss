@@ -13,7 +13,7 @@ public class DummyFormJourneyService(
     IDummyFormBranchEvaluator branchEvaluator,
     IDummyFormSubmissionAnswerStore answerStore,
     IRecaptchaV3Verifier recaptchaVerifier,
-    IToolSettingsResolver toolSettingsResolver,
+    IDummyToolSettingsResolver dummyToolSettingsResolver,
     IPageRouteHelper pageRouteHelper) : IDummyFormJourneyService
 {
     public DummyFormContainerViewModel BuildViewModel(DummyFormContainerBlock form, Guid submissionId, ITempDataDictionary tempData)
@@ -156,7 +156,7 @@ public class DummyFormJourneyService(
     private SettingsPage ResolveCurrentSettingsPage()
     {
         return pageRouteHelper.Page is DummySitePageData dummyPage
-            ? toolSettingsResolver.Resolve(dummyPage)
+            ? dummyToolSettingsResolver.Resolve(dummyPage)
             : null;
     }
 
