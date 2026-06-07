@@ -26,13 +26,41 @@ public class DummyFormContainerBlockController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Submit(DummyFormJourneyPostModel postModel)
     {
+        if (!ModelState.IsValid)
+        {
+            TempData["DummyFormJourneyMessage"] = ResolveModelStateMessage();
+            return RedirectBack(postModel.ReturnUrl, postModel.SubmissionId == Guid.Empty ? null : postModel.SubmissionId);
+        }
+
         var result = await journeyService.SubmitAsync(postModel, TempData);
         if (!result.IsValid)
         {
-            return BadRequest();
+            TempData["DummyFormJourneyMessage"] = "Unable to continue this form. Please refresh and try again.";
+            return RedirectBack(postModel.ReturnUrl, postModel.SubmissionId == Guid.Empty ? null : postModel.SubmissionId);
         }
 
         return RedirectBack(postModel.ReturnUrl, result.SubmissionId);
+    }
+
+    private string ResolveModelStateMessage()
+    {
+        var firstError = ModelState
+            .Values
+            .SelectMany(value => value.Errors)
+            .Select(error => error.ErrorMessage)
+            .FirstOrDefault(message => !string.IsNullOrWhiteSpace(message));
+
+        if (!string.IsNullOrWhiteSpace(firstError))
+        {
+            return firstError;
+        }
+
+        if (ModelState.Values.SelectMany(value => value.Errors).Any(error => error.Exception != null))
+        {
+            return "Some submitted values could not be read. Please check the current step and try again.";
+        }
+
+        return "Please check the current step and try again.";
     }
 
     private Guid ResolveSubmissionId()
