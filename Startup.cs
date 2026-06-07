@@ -35,6 +35,7 @@ public class Startup(IWebHostEnvironment webHostingEnvironment)
         services.AddSingleton<IDummyFormBranchEvaluator, DummyFormBranchEvaluator>();
         services.AddTransient<IDummyFormSubmissionAnswerStore, DummyFormSubmissionAnswerStore>();
         services.AddTransient<IDummyFormJourneyService, DummyFormJourneyService>();
+        services.AddTransient<IToolSettingsResolver, ToolSettingsResolver>();
         services.AddTransient<IFormToolResolver, FormToolResolver>();
         services.AddHttpClient<IRecaptchaV3Verifier, RecaptchaV3Verifier>();
 

@@ -11,7 +11,7 @@ namespace alloy13dss.Models.Pages;
     GUID = "4E2B35B7-8F38-40C1-929D-F0F0D0F5FB52",
     GroupName = Globals.GroupNames.Specialized)]
 [SiteImageUrl]
-public class ContentPage : SitePageData
+public class ContentPage : DummySitePageData
 {
     [Display(
         Name = "Content area",

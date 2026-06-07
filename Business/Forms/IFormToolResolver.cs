@@ -5,5 +5,5 @@ namespace alloy13dss.Business.Forms;
 
 public interface IFormToolResolver
 {
-    DummyFormContainerBlock Resolve(SitePageData page);
+    DummyFormContainerBlock Resolve(DummySitePageData page);
 }

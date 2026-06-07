@@ -7,7 +7,7 @@ namespace alloy13dss.Models.Pages;
 /// </summary>
 [SiteContentType(GUID = "9CCC8A41-5C8C-4BE0-8E73-520FF3DE8267")]
 [SiteImageUrl(Globals.StaticGraphicsFolderPath + "page-type-thumbnail-standard.png")]
-public class StandardPage : SitePageData
+public class StandardPage : DummySitePageData
 {
     [Display(
         GroupName = SystemTabNames.Content,

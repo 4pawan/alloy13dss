@@ -4,9 +4,11 @@ using alloy13dss.Models.Pages;
 
 namespace alloy13dss.Business.Forms;
 
-public class FormToolResolver(IContentLoader contentLoader) : IFormToolResolver
+public class FormToolResolver(
+    IContentLoader contentLoader,
+    IToolSettingsResolver toolSettingsResolver) : IFormToolResolver
 {
-    public DummyFormContainerBlock Resolve(SitePageData page)
+    public DummyFormContainerBlock Resolve(DummySitePageData page)
     {
         if (page == null)
         {
@@ -19,9 +21,9 @@ public class FormToolResolver(IContentLoader contentLoader) : IFormToolResolver
             return directForm;
         }
 
-        if (ContentReference.IsNullOrEmpty(page.SettingsPageLink) ||
-            string.IsNullOrWhiteSpace(page.FormToolKey) ||
-            !contentLoader.TryGet(page.SettingsPageLink, out SettingsPage settingsPage))
+        var settingsPage = toolSettingsResolver.Resolve(page);
+
+        if (settingsPage == null || string.IsNullOrWhiteSpace(page.FormToolKey))
         {
             return null;
         }

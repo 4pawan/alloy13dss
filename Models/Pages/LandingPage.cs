@@ -9,7 +9,7 @@ namespace alloy13dss.Models.Pages;
    GUID = "DBED4258-8213-48DB-A11F-99C034172A54",
    GroupName = Globals.GroupNames.Specialized)]
 [SiteImageUrl]
-public class LandingPage : SitePageData
+public class LandingPage : DummySitePageData
 {
     [Display(
         GroupName = SystemTabNames.Content,
