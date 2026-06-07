@@ -6,6 +6,7 @@ public static class DummyServiceCollectionExtensions
 {
     public static IServiceCollection AddDummyForms(this IServiceCollection services)
     {
+        services.AddMemoryCache();
         services.AddSingleton<IDummyFormJourneyStateRepository, DummyFormJourneyStateRepository>();
         services.AddSingleton<IDummyFormBranchEvaluator, DummyFormBranchEvaluator>();
         services.AddTransient<IDummyFormSubmissionAnswerStore, DummyFormSubmissionAnswerStore>();
