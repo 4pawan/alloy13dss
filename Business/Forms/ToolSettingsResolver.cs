@@ -4,7 +4,7 @@ namespace alloy13dss.Business.Forms;
 
 public class ToolSettingsResolver(IContentLoader contentLoader) : IToolSettingsResolver
 {
-    public SettingsPage Resolve(SitePageData page)
+    public SettingsPage Resolve(DummySitePageData page)
     {
         return page == null ? null : ResolveFromContent(page);
     }

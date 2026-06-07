@@ -155,8 +155,8 @@ public class DummyFormJourneyService(
 
     private SettingsPage ResolveCurrentSettingsPage()
     {
-        return pageRouteHelper.Page is SitePageData sitePage
-            ? toolSettingsResolver.Resolve(sitePage)
+        return pageRouteHelper.Page is DummySitePageData dummyPage
+            ? toolSettingsResolver.Resolve(dummyPage)
             : null;
     }
 

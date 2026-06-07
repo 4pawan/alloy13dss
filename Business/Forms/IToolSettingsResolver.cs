@@ -4,7 +4,7 @@ namespace alloy13dss.Business.Forms;
 
 public interface IToolSettingsResolver
 {
-    SettingsPage Resolve(SitePageData page);
+    SettingsPage Resolve(DummySitePageData page);
 
     SettingsPage Resolve(ContentReference contentLink);
 }
