@@ -9,8 +9,6 @@ public class DummyFormJourneyState : IDynamicData
 
     public Guid SubmissionId { get; set; }
 
-    public ContentReference FormContentLink { get; set; }
-
     public ContentReference CurrentElement { get; set; }
 
     public List<ContentReference> VisitedElements { get; set; } = [];

@@ -53,7 +53,6 @@ This is the custom question element. It extends `TextboxElementBlock`.
 It adds:
 
 - `BranchingKey`: a stable key used by other questions to read this question's submitted value.
-- `AlwaysRedirectToSourceKey`: optional source key of a question that should always be shown after this question is submitted.
 - `Rules`: an `IList<DummyQuestionVisibilityRule>` configured directly on the question.
 
 Example:
@@ -61,7 +60,6 @@ Example:
 ```text
 Q1
   BranchingKey: customerType
-  AlwaysRedirectToSourceKey:
 
 Q2
   BranchingKey: companyName
@@ -146,7 +144,6 @@ It loads only `DummyQuestionElementBlock` items from `form.ElementsArea`.
 `ResolveNextElement`:
 
 - Finds the current question in the ordered list.
-- If the current question has `AlwaysRedirectToSourceKey`, jumps to the question with that `BranchingKey`.
 - Scans following questions.
 - For each next question, checks that question's own `Rules`.
 - Returns the first question whose rules match.
@@ -156,16 +153,13 @@ It loads only `DummyQuestionElementBlock` items from `form.ElementsArea`.
 
 File: `Business/Forms/DummyFormSubmissionAnswerStore.cs`
 
-This is currently an in-memory adapter.
+This is backed by Optimizely Forms submission storage.
 
-When an answer is saved, it stores the value under:
+When an answer is saved, it updates the active Forms element value in the current submission through `DataSubmissionService`.
 
-- the element content id
-- the question's `BranchingKey`, if configured
+When answers are read for branching, it loads the submission through `IFormDataRepository` and maps each question's Forms `ElementName` back to that question's `BranchingKey`.
 
 The `BranchingKey` entry is what visibility rules use.
-
-Production note: this should be replaced with real Optimizely Forms submission storage so answers survive app restarts and can be resumed by submission id.
 
 ### DummyFormJourneyState
 
@@ -180,7 +174,7 @@ It tracks navigation state:
 - `VisitedElements`
 - `UpdatedUtc`
 
-`FormContentLink` still exists in the current code as a defensive reference, but it can be removed if you want the form always resolved from page/settings.
+The form reference is not stored in DDS. It is resolved by the page/settings architecture and carried through the active POST model.
 
 ## Views
 
@@ -266,21 +260,18 @@ Q3 DummyQuestionElementBlock
     Value: Personal
 ```
 
-Always-redirect example:
+Summary resume example:
 
 ```text
-Q4 DummyQuestionElementBlock
-  BranchingKey: abc
-  AlwaysRedirectToSourceKey: xyz
-
-Q7 DummyQuestionElementBlock
-  BranchingKey: xyz
+Q6 Summary DummyQuestionElementBlock
+  BranchingKey: summary
 ```
 
 Runtime:
 
 ```text
-submit Q4 -> render Q7
+submit Q5 -> render Summary
+resume later with same submissionId -> render Summary
 ```
 
 Runtime:
@@ -324,6 +315,5 @@ If Q1 = Personal:
 
 ## Current Limitations
 
-- Answer storage is still in-memory and should be replaced with Optimizely Forms submissions.
 - Element-level built-in Forms validation still needs full integration in the custom submit path.
 - Branching is now modeled by hide/show rules on each next question, not by separate branch target blocks.

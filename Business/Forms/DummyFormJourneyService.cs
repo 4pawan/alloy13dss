@@ -65,7 +65,7 @@ public class DummyFormJourneyService(
             return new DummyFormJourneyResult { IsValid = true, SubmissionId = state.SubmissionId };
         }
 
-        answerStore.SaveAnswer(state.SubmissionId, activeElement, postModel.CurrentValue);
+        answerStore.SaveAnswer(state.SubmissionId, form, activeElement, postModel.CurrentValue);
         MoveNext(form, state);
 
         return new DummyFormJourneyResult { IsValid = true, SubmissionId = state.SubmissionId };
@@ -78,6 +78,7 @@ public class DummyFormJourneyService(
         var state = stateRepository.Get(submissionId);
         if (state != null)
         {
+            RestoreResumeElement(state);
             return state;
         }
 
@@ -86,7 +87,6 @@ public class DummyFormJourneyService(
         state = new DummyFormJourneyState
         {
             SubmissionId = submissionId,
-            FormContentLink = GetContentLink(form),
             CurrentElement = firstElement
         };
 
@@ -99,7 +99,7 @@ public class DummyFormJourneyService(
     private void MoveNext(DummyFormContainerBlock form, DummyFormJourneyState state)
     {
         var previousPath = state.VisitedElements.ToList();
-        var nextElement = branchEvaluator.ResolveNextElement(form, state, answerStore.GetAnswers(state.SubmissionId));
+        var nextElement = branchEvaluator.ResolveNextElement(form, state, answerStore.GetAnswers(state.SubmissionId, form));
 
         if (ContentReference.IsNullOrEmpty(nextElement))
         {
@@ -108,10 +108,25 @@ public class DummyFormJourneyService(
             return;
         }
 
-        ResetAbandonedBranchAnswers(state, previousPath, nextElement);
+        ResetAbandonedBranchAnswers(form, state, previousPath, nextElement);
         AddVisitedElement(state, nextElement);
         state.CurrentElement = nextElement;
         stateRepository.Save(state);
+    }
+
+    private void RestoreResumeElement(DummyFormJourneyState state)
+    {
+        var resumeElement = ResolveResumeElement(state);
+        if (!ContentReference.IsNullOrEmpty(resumeElement) && ContentReference.IsNullOrEmpty(state.CurrentElement))
+        {
+            state.CurrentElement = resumeElement;
+            stateRepository.Save(state);
+        }
+    }
+
+    private static ContentReference ResolveResumeElement(DummyFormJourneyState state)
+    {
+        return state.VisitedElements.LastOrDefault() ?? ContentReference.EmptyReference;
     }
 
     private ElementBlockBase ResolveActiveElement(DummyFormJourneyState state)
@@ -167,6 +182,7 @@ public class DummyFormJourneyService(
     }
 
     private void ResetAbandonedBranchAnswers(
+        DummyFormContainerBlock form,
         DummyFormJourneyState state,
         IReadOnlyList<ContentReference> previousPath,
         ContentReference nextElement)
@@ -178,11 +194,11 @@ public class DummyFormJourneyService(
         }
 
         var abandonedElements = previousPath.Skip(targetIndex + 1).ToList();
-        answerStore.ClearAnswers(state.SubmissionId, abandonedElements);
+        answerStore.ClearAnswers(state.SubmissionId, form, abandonedElements);
         stateRepository.ResetBranch(state, nextElement);
     }
 
-    private static void AddVisitedElement(DummyFormJourneyState state, ContentReference elementLink)
+    private void AddVisitedElement(DummyFormJourneyState state, ContentReference elementLink)
     {
         if (ContentReference.IsNullOrEmpty(elementLink) || state.VisitedElements.Any(x => SameContent(x, elementLink)))
         {

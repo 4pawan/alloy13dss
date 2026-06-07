@@ -19,21 +19,6 @@ public class DummyFormBranchEvaluator(IContentLoader contentLoader) : IDummyForm
     {
         var questions = LoadQuestions(form);
         var currentIndex = IndexOf(questions, state.CurrentElement);
-        var currentQuestion = currentIndex >= 0 ? questions[currentIndex] : null;
-
-        if (!string.IsNullOrWhiteSpace(currentQuestion?.AlwaysRedirectToSourceKey))
-        {
-            var redirectQuestion = questions.FirstOrDefault(question =>
-                string.Equals(
-                    question.BranchingKey,
-                    currentQuestion.AlwaysRedirectToSourceKey,
-                    StringComparison.OrdinalIgnoreCase));
-
-            if (redirectQuestion != null)
-            {
-                return GetContentLink(redirectQuestion);
-            }
-        }
 
         foreach (var question in questions.Skip(Math.Max(currentIndex + 1, 0)))
         {

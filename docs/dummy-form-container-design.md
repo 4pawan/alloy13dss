@@ -21,7 +21,7 @@ DummyFormContainerBlock
 
 Each `DummyQuestionElementBlock` has a `Rules` list. These rules check previously submitted responses by `BranchingKey` and decide whether the current question should be shown.
 
-Each question can also set `AlwaysRedirectToSourceKey`. When set, submitting that question always jumps to the question whose `BranchingKey` matches the configured value.
+Once the summary question has been visited, a later resume can return to it because it is the last visited element.
 
 ## Runtime State
 
@@ -40,13 +40,14 @@ The submission id is the resume key. The state record tracks visited elements so
 2. User submits the current question.
 3. Validate the current visible Forms element using the built-in Forms validation pipeline.
 4. Validate reCAPTCHA v3 on every step using the page's selected `SettingsPage`.
-5. Save the current question value into the Forms submission or answer store.
-6. If the current question has `AlwaysRedirectToSourceKey`, redirect to that question.
-7. Otherwise scan the next `DummyQuestionElementBlock` items in order.
-8. For each next question, evaluate that question's own `Rules`.
-9. Skip questions whose rules do not match.
-10. Render the first matching question.
+5. Save the current question value into the Optimizely Forms submission.
+6. Scan the next `DummyQuestionElementBlock` items in order.
+7. For each next question, evaluate that question's own `Rules`.
+8. Skip questions whose rules do not match.
+9. Render the first matching question.
 
-## Next Implementation Point
+If the journey is later resumed after completion, the service restores the last visited element from `VisitedElements`.
 
-Replace the in-memory answer store with Optimizely Forms submission storage. Answers should be readable by `BranchingKey` so question visibility rules can evaluate submitted responses reliably across app restarts and resumed sessions.
+## Submission Answer Mapping
+
+Answers are stored in Optimizely Forms submissions by element field name. At runtime, `DummyFormSubmissionAnswerStore` reads the submission and maps each `DummyQuestionElementBlock.BranchingKey` to the corresponding stored field value so visibility rules can use editor-friendly source keys.

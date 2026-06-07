@@ -20,13 +20,6 @@ public class DummyQuestionElementBlock : TextboxElementBlock
     public virtual string BranchingKey { get; set; }
 
     [Display(
-        Name = "Always redirect to source key",
-        Description = "Optional source key of the question that should always be shown after this question is submitted.",
-        GroupName = SystemTabNames.Content,
-        Order = 105)]
-    public virtual string AlwaysRedirectToSourceKey { get; set; }
-
-    [Display(
         Name = "Visibility rules",
         Description = "Rules that decide whether this question should be shown. All rules must match.",
         GroupName = SystemTabNames.Content,
