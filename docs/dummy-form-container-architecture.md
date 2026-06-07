@@ -86,10 +86,12 @@ This is a simple rule object used inside `DummyQuestionElementBlock.Rules`.
 It contains:
 
 - `QuestionKey`: the `BranchingKey` of a previously submitted question.
-- `Operator`: `Equals`, `NotEquals`, `Contains`, `IsEmpty`, or `IsNotEmpty`.
+- `Operator`: `Equals`, `NotEquals`, `Contains`, `NotContains`, `IsEmpty`, `IsNotEmpty`, `IsAnyOf`, or `IsNotAnyOf`.
 - `Value`: comparison value.
 
 All rules on a question must match for that question to be shown.
+
+For `IsAnyOf` and `IsNotAnyOf`, enter multiple values in `Value` separated by comma, semicolon, or pipe.
 
 The rule uses string keys instead of `ContentReference`, which avoids the `PropertyList<T>` serialization issue caused by serializing `ContentReference` internals.
 

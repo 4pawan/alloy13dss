@@ -89,10 +89,21 @@ public class DummyFormBranchEvaluator(IContentLoader contentLoader) : IDummyForm
             DummyQuestionRuleOperator.Equals => string.Equals(submittedValue, expected, StringComparison.OrdinalIgnoreCase),
             DummyQuestionRuleOperator.NotEquals => !string.Equals(submittedValue, expected, StringComparison.OrdinalIgnoreCase),
             DummyQuestionRuleOperator.Contains => submittedValue.Contains(expected, StringComparison.OrdinalIgnoreCase),
+            DummyQuestionRuleOperator.NotContains => !submittedValue.Contains(expected, StringComparison.OrdinalIgnoreCase),
             DummyQuestionRuleOperator.IsEmpty => !hasValue || string.IsNullOrWhiteSpace(submittedValue),
             DummyQuestionRuleOperator.IsNotEmpty => hasValue && !string.IsNullOrWhiteSpace(submittedValue),
+            DummyQuestionRuleOperator.IsAnyOf => ExpectedValues(expected).Any(value =>
+                string.Equals(submittedValue, value, StringComparison.OrdinalIgnoreCase)),
+            DummyQuestionRuleOperator.IsNotAnyOf => !ExpectedValues(expected).Any(value =>
+                string.Equals(submittedValue, value, StringComparison.OrdinalIgnoreCase)),
             _ => false
         };
+    }
+
+    private static IEnumerable<string> ExpectedValues(string expected)
+    {
+        return (expected ?? string.Empty)
+            .Split(new[] { ',', ';', '|' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 
     private static int IndexOf(IList<DummyQuestionElementBlock> questions, ContentReference element)

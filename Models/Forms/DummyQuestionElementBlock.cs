@@ -55,8 +55,11 @@ public enum DummyQuestionRuleOperator
     Equals,
     NotEquals,
     Contains,
+    NotContains,
     IsEmpty,
-    IsNotEmpty
+    IsNotEmpty,
+    IsAnyOf,
+    IsNotAnyOf
 }
 
 [PropertyDefinitionType]
