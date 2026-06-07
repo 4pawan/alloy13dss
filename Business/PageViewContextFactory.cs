@@ -2,6 +2,7 @@ using alloy13dss.Models.Pages;
 using alloy13dss.Models.ViewModels;
 using EPiServer.Data;
 using EPiServer.ServiceLocation;
+using EPiServer.SpecializedProperties;
 using EPiServer.Web.Routing;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Html;
@@ -31,6 +32,7 @@ public class PageViewContextFactory(
         }
 
         var startPage = contentLoader.Get<StartPage>(startPageContentLink);
+        var settingsPage = ResolveSettingsPage(currentContentLink);
 
         return new LayoutModel
         {
@@ -40,11 +42,25 @@ public class PageViewContextFactory(
             CompanyInformationPages = startPage.CompanyInformationPageLinks,
             NewsPages = startPage.NewsPageLinks,
             CustomerZonePages = startPage.CustomerZonePageLinks,
+            FooterLinks = settingsPage?.FooterLinks ?? new LinkItemCollection(),
+            GtmScript = settingsPage?.GtmScript,
             LoggedIn = httpContext.User.Identity.IsAuthenticated,
             LoginUrl = new HtmlString(GetLoginUrl(currentContentLink)),
             SearchActionUrl = new HtmlString(UrlResolver.Current.GetUrl(startPage.SearchPageLink)),
             IsInReadonlyMode = databaseMode.DatabaseMode == DatabaseMode.ReadOnly
         };
+    }
+
+    private SettingsPage ResolveSettingsPage(ContentReference currentContentLink)
+    {
+        if (!contentLoader.TryGet(currentContentLink, out SitePageData currentPage) ||
+            ContentReference.IsNullOrEmpty(currentPage.SettingsPageLink) ||
+            !contentLoader.TryGet(currentPage.SettingsPageLink, out SettingsPage settingsPage))
+        {
+            return null;
+        }
+
+        return settingsPage;
     }
 
     private string GetLoginUrl(ContentReference returnToContentLink)

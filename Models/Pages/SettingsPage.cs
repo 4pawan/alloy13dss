@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using alloy13dss.Models.Blocks;
+using EPiServer.SpecializedProperties;
+using EPiServer.Web;
 
 namespace alloy13dss.Models.Pages;
 
@@ -42,6 +44,21 @@ public class SettingsPage : SitePageData
         Order = 100)]
     [AllowedTypes(typeof(FormToolSettingsBlock))]
     public virtual ContentArea FormTools { get; set; }
+
+    [Display(
+        Name = "Footer links",
+        Description = "Links rendered in the site and dummy tool footers.",
+        GroupName = SystemTabNames.Content,
+        Order = 110)]
+    public virtual LinkItemCollection FooterLinks { get; set; }
+
+    [Display(
+        Name = "GTM script",
+        Description = "Google Tag Manager script rendered in the page head.",
+        GroupName = SystemTabNames.Content,
+        Order = 120)]
+    [UIHint(UIHint.Textarea)]
+    public virtual string GtmScript { get; set; }
 
     public override void SetDefaultValues(ContentType contentType)
     {

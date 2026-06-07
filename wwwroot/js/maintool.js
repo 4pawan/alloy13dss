@@ -28,12 +28,23 @@
         return true;
     }
 
+    function updateActiveQuestionTitle(form) {
+        var title = form.getAttribute('data-dummy-active-question-title') || '';
+        var targets = document.querySelectorAll('[data-dummy-active-question-title-target]');
+
+        for (var index = 0; index < targets.length; index++) {
+            targets[index].textContent = title;
+            targets[index].hidden = !title;
+        }
+    }
+
     function wireForm(form) {
         if (form.getAttribute('data-dummy-form-ready') === 'true') {
             return;
         }
 
         form.setAttribute('data-dummy-form-ready', 'true');
+        updateActiveQuestionTitle(form);
 
         form.addEventListener('submit', function (event) {
             copyCurrentValue(form);

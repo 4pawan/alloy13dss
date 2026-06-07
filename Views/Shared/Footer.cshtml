@@ -33,6 +33,20 @@
                     </li>
                 </ul>
             </div>
+            @if (Model.Layout.FooterLinks?.Any() == true)
+            {
+                <div class="col-3">
+                    <h3>Links</h3>
+                    <ul>
+                        @foreach (var link in Model.Layout.FooterLinks)
+                        {
+                            <li>
+                                <a href="@link.Href" title="@link.Title" target="@link.Target">@link.Text</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
         </div>
     </div>
 </footer>

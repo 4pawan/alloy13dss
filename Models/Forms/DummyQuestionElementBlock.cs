@@ -13,6 +13,13 @@ namespace alloy13dss.Models.Forms;
 public class DummyQuestionElementBlock : TextboxElementBlock
 {
     [Display(
+        Name = "Title",
+        Description = "Heading shown in the dummy tool header while this question is active.",
+        GroupName = SystemTabNames.Content,
+        Order = 90)]
+    public virtual string Title { get; set; }
+
+    [Display(
         Name = "Source key",
         Description = "Stable key used by other question rules to read this question's submitted response.",
         GroupName = SystemTabNames.Content,

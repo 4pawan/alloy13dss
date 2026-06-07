@@ -15,6 +15,8 @@ public class DummyFormContainerViewModel
 
     public ElementBlockBase ActiveElement { get; set; }
 
+    public string ActiveElementTitle { get; set; }
+
     public Guid SubmissionId { get; set; }
 
     public ContentReference ActiveElementLink { get; set; }

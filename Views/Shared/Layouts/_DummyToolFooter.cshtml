@@ -2,5 +2,17 @@
 
 <footer class="dummy-theme__footer">
     <span>Dummy Tools</span>
-    <span class="dummy-theme__nav">Configurable CMS journeys powered by reusable form containers.</span>
+    @if (Model.Layout.FooterLinks?.Any() == true)
+    {
+        <nav class="dummy-theme__nav" aria-label="Footer links">
+            @foreach (var link in Model.Layout.FooterLinks)
+            {
+                <a href="@link.Href" title="@link.Title" target="@link.Target">@link.Text</a>
+            }
+        </nav>
+    }
+    else
+    {
+        <span class="dummy-theme__nav">Configurable CMS journeys powered by reusable form containers.</span>
+    }
 </footer>

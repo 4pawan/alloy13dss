@@ -22,6 +22,10 @@ public class LayoutModel
 
     public LinkItemCollection CustomerZonePages { get; set; }
 
+    public LinkItemCollection FooterLinks { get; set; }
+
+    public string GtmScript { get; set; }
+
     public bool LoggedIn { get; set; }
 
     public HtmlString LoginUrl { get; set; }

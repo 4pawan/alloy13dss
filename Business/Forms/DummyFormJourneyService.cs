@@ -28,6 +28,7 @@ public class DummyFormJourneyService(
             SettingsPageLink = settingsPage?.ContentLink ?? ContentReference.EmptyReference,
             RecaptchaSiteKey = settingsPage?.RecaptchaSiteKey,
             ActiveElement = activeElement,
+            ActiveElementTitle = ResolveActiveElementTitle(activeElement),
             ActiveElementLink = GetContentLink(activeElement),
             SubmissionId = state.SubmissionId,
             CanGoBack = state.VisitedElements.Count > 1,
@@ -139,6 +140,16 @@ public class DummyFormJourneyService(
         return contentLoader.TryGet(state.CurrentElement, out ElementBlockBase element)
             ? element
             : null;
+    }
+
+    private static string ResolveActiveElementTitle(ElementBlockBase activeElement)
+    {
+        if (activeElement is DummyQuestionElementBlock question && !string.IsNullOrWhiteSpace(question.Title))
+        {
+            return question.Title;
+        }
+
+        return activeElement?.Label;
     }
 
     private SettingsPage ResolveCurrentSettingsPage()

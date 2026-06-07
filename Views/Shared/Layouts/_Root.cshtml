@@ -24,6 +24,10 @@
     <link rel="stylesheet" href="~/css/theme.min.css" />
     <link rel="shortcut icon" href="~/favicon.ico" type="image/x-icon" />
     <required-client-resources area="Header" />
+    @if (!string.IsNullOrWhiteSpace(Model.Layout.GtmScript))
+    {
+        @Html.Raw(Model.Layout.GtmScript)
+    }
 </head>
 
 <body>
