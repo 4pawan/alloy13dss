@@ -1,0 +1,141 @@
+@model IPageViewModel<SitePageData>
+
+@{
+    Layout = "~/Views/Shared/Layouts/_Root.cshtml";
+}
+
+<div class="dummy-theme">
+    @await Html.PartialAsync("~/Views/Shared/Layouts/_DummyToolHeader.cshtml", Model)
+    <main class="dummy-theme__main">
+        @RenderBody()
+    </main>
+    @await Html.PartialAsync("~/Views/Shared/Layouts/_DummyToolFooter.cshtml", Model)
+</div>
+
+<style>
+    .dummy-theme {
+        --dummy-ink: #1e293b;
+        --dummy-muted: #64748b;
+        --dummy-line: #d6e1ea;
+        --dummy-panel: #ffffff;
+        --dummy-accent: #0f766e;
+        --dummy-accent-soft: #e0f2ef;
+        color: var(--dummy-ink);
+        font-family: Arial, sans-serif;
+    }
+
+    .dummy-theme__bar,
+    .dummy-theme__footer {
+        border: 1px solid var(--dummy-line);
+        background: var(--dummy-panel);
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin: 18px 0;
+    }
+
+    .dummy-theme__bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+
+    .dummy-theme__brand {
+        font-weight: 700;
+        font-size: 18px;
+    }
+
+    .dummy-theme__nav {
+        display: flex;
+        gap: 12px;
+        color: var(--dummy-muted);
+        font-size: 14px;
+    }
+
+    .dummy-theme__hero {
+        display: grid;
+        gap: 18px;
+        padding: 40px 0 28px;
+        border-bottom: 1px solid var(--dummy-line);
+    }
+
+    .dummy-theme__eyebrow {
+        color: var(--dummy-accent);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0;
+    }
+
+    .dummy-theme__title {
+        font-size: 40px;
+        line-height: 1.1;
+        margin: 0;
+    }
+
+    .dummy-theme__lead {
+        color: var(--dummy-muted);
+        font-size: 18px;
+        max-width: 720px;
+    }
+
+    .dummy-theme__grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(320px, 440px);
+        gap: 28px;
+        align-items: start;
+        padding: 28px 0;
+    }
+
+    .dummy-theme__tool {
+        border: 1px solid var(--dummy-line);
+        border-radius: 8px;
+        background: var(--dummy-panel);
+        padding: 20px;
+    }
+
+    .dummy-theme .EPiServerForms input,
+    .dummy-theme .EPiServerForms textarea,
+    .dummy-theme .EPiServerForms select {
+        width: 100%;
+        border: 1px solid var(--dummy-line);
+        border-radius: 6px;
+        padding: 10px 12px;
+    }
+
+    .dummy-theme .Form__NavigationBar {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    .dummy-theme button {
+        border: 1px solid var(--dummy-accent);
+        background: var(--dummy-accent);
+        color: #ffffff;
+        border-radius: 6px;
+        padding: 10px 14px;
+    }
+
+    .dummy-theme button[disabled] {
+        background: #f1f5f9;
+        border-color: var(--dummy-line);
+        color: var(--dummy-muted);
+    }
+
+    @@media (max-width: 768px) {
+        .dummy-theme__bar,
+        .dummy-theme__grid {
+            display: block;
+        }
+
+        .dummy-theme__tool {
+            margin-top: 20px;
+        }
+
+        .dummy-theme__title {
+            font-size: 32px;
+        }
+    }
+</style>

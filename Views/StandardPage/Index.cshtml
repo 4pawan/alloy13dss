@@ -1,15 +1,40 @@
 @inherits alloy13dss.Views.AlloyPageBase<PageViewModel<alloy13dss.Models.Pages.StandardPage>>
+@using alloy13dss.Business.Forms
+@using EPiServer.ServiceLocation
 
-@{ Layout = "~/Views/Shared/Layouts/_LeftNavigation.cshtml"; }
+@{
+    Layout = "~/Views/Shared/Layouts/_DummyToolLayout.cshtml";
+    var toolResolver = ServiceLocator.Current.GetInstance<IFormToolResolver>();
+    var formTool = toolResolver.Resolve(Model.CurrentPage);
+}
 
-<div class="content">
-    <h1 epi-property="@Model.CurrentPage.Name">@Model.CurrentPage.Name</h1>
-    <p class="lead" epi-property="@Model.CurrentPage.MetaDescription">@Model.CurrentPage.MetaDescription</p>
-    <div class="clearfix">
-        <div epi-property="@Model.CurrentPage.MainBody" />
+<section class="dummy-theme__hero">
+    <div class="dummy-theme__eyebrow">Standard page</div>
+    <h1 class="dummy-theme__title" epi-property="@Model.CurrentPage.Name">@Model.CurrentPage.Name</h1>
+    <p class="dummy-theme__lead" epi-property="@Model.CurrentPage.MetaDescription">@Model.CurrentPage.MetaDescription</p>
+</section>
+
+<section class="dummy-theme__grid">
+    <div>
+        <div class="content">
+            <div class="clearfix">
+                <div epi-property="@Model.CurrentPage.MainBody" />
+            </div>
+        </div>
+
+        <div epi-property="@Model.CurrentPage.MainContentArea" class="row">
+            <div epi-property-item class="block" epi-on-item-rendered="OnItemRendered" />
+        </div>
     </div>
-</div>
 
-<div epi-property="@Model.CurrentPage.MainContentArea" class="row">
-    <div epi-property-item class="block" epi-on-item-rendered="OnItemRendered" />
-</div>
+    <aside class="dummy-theme__tool">
+        @if (formTool != null)
+        {
+            Html.RenderContentData(formTool, false);
+        }
+        else
+        {
+            <div>Select a direct form container block or configure a form tool key from a settings page.</div>
+        }
+    </aside>
+</section>

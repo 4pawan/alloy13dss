@@ -2,88 +2,110 @@ using alloy13dss.Models.Forms;
 
 namespace alloy13dss.Business.Forms;
 
-public class DummyFormBranchEvaluator : IDummyFormBranchEvaluator
+public class DummyFormBranchEvaluator(IContentLoader contentLoader) : IDummyFormBranchEvaluator
 {
+    public ContentReference ResolveFirstElement(DummyFormContainerBlock form)
+    {
+        var questions = LoadQuestions(form);
+
+        return GetContentLink(questions.FirstOrDefault())
+            ?? ContentReference.EmptyReference;
+    }
+
     public ContentReference ResolveNextElement(
         DummyFormContainerBlock form,
         DummyFormJourneyState state,
         IReadOnlyDictionary<string, string> submissionAnswers)
     {
-        var currentRule = form.JourneyRules?.FirstOrDefault(x => SameContent(x.Element, state.CurrentElement));
+        var questions = LoadQuestions(form);
+        var currentIndex = IndexOf(questions, state.CurrentElement);
+        var currentQuestion = currentIndex >= 0 ? questions[currentIndex] : null;
 
-        if (currentRule == null)
+        if (!string.IsNullOrWhiteSpace(currentQuestion?.AlwaysRedirectToSourceKey))
         {
-            return FirstEligibleElement(form, submissionAnswers);
-        }
+            var redirectQuestion = questions.FirstOrDefault(question =>
+                string.Equals(
+                    question.BranchingKey,
+                    currentQuestion.AlwaysRedirectToSourceKey,
+                    StringComparison.OrdinalIgnoreCase));
 
-        var matchedBranch = currentRule.Branches?
-            .FirstOrDefault(branch => AreSatisfied(branch.Conditions, submissionAnswers));
-
-        if (matchedBranch != null && !ContentReference.IsNullOrEmpty(matchedBranch.TargetElement))
-        {
-            return matchedBranch.TargetElement;
-        }
-
-        if (!ContentReference.IsNullOrEmpty(currentRule.DefaultNextElement))
-        {
-            return FirstEligibleElement(form, submissionAnswers, currentRule.DefaultNextElement);
-        }
-
-        var currentIndex = form.JourneyRules?.ToList().FindIndex(x => SameContent(x.Element, currentRule.Element)) ?? -1;
-
-        return FirstEligibleElement(form, submissionAnswers, startIndex: currentIndex + 1);
-    }
-
-    private static ContentReference FirstEligibleElement(
-        DummyFormContainerBlock form,
-        IReadOnlyDictionary<string, string> submissionAnswers,
-        ContentReference preferredElement = null,
-        int startIndex = 0)
-    {
-        var rules = form.JourneyRules?.ToList() ?? [];
-
-        if (!ContentReference.IsNullOrEmpty(preferredElement))
-        {
-            var preferred = rules.FirstOrDefault(x => SameContent(x.Element, preferredElement));
-            if (preferred != null && AreSatisfied(preferred.Conditions, submissionAnswers))
+            if (redirectQuestion != null)
             {
-                return preferred.Element;
+                return GetContentLink(redirectQuestion);
             }
         }
 
-        foreach (var rule in rules.Skip(Math.Max(startIndex, 0)))
+        foreach (var question in questions.Skip(Math.Max(currentIndex + 1, 0)))
         {
-            if (!ContentReference.IsNullOrEmpty(rule.Element) && AreSatisfied(rule.Conditions, submissionAnswers))
+            if (AreSatisfied(question.Rules, submissionAnswers))
             {
-                return rule.Element;
+                return GetContentLink(question);
             }
         }
 
         return ContentReference.EmptyReference;
     }
 
-    private static bool AreSatisfied(IList<DummyFormCondition> conditions, IReadOnlyDictionary<string, string> submissionAnswers)
+    private IList<DummyQuestionElementBlock> LoadQuestions(DummyFormContainerBlock form)
     {
-        return conditions == null || conditions.Count == 0 || conditions.All(condition => IsSatisfied(condition, submissionAnswers));
+        var questions = new List<DummyQuestionElementBlock>();
+
+        if (form.ElementsArea?.Items == null)
+        {
+            return questions;
+        }
+
+        foreach (var item in form.ElementsArea.Items)
+        {
+            if (ContentReference.IsNullOrEmpty(item.ContentLink))
+            {
+                continue;
+            }
+
+            if (contentLoader.TryGet(item.ContentLink, out DummyQuestionElementBlock question))
+            {
+                questions.Add(question);
+            }
+        }
+
+        return questions;
     }
 
-    private static bool IsSatisfied(DummyFormCondition condition, IReadOnlyDictionary<string, string> submissionAnswers)
+    private static bool AreSatisfied(IList<DummyQuestionVisibilityRule> rules, IReadOnlyDictionary<string, string> submissionAnswers)
     {
-        var key = condition.QuestionElement?.ID.ToString();
-        var submittedValue = string.Empty;
-        var hasValue = key != null && submissionAnswers.TryGetValue(key, out submittedValue);
-        submittedValue ??= string.Empty;
-        var expected = condition.Value ?? string.Empty;
+        return rules == null || rules.Count == 0 || rules.All(rule => IsSatisfied(rule, submissionAnswers));
+    }
 
-        return condition.Operator switch
+    private static bool IsSatisfied(DummyQuestionVisibilityRule rule, IReadOnlyDictionary<string, string> submissionAnswers)
+    {
+        var key = rule.QuestionKey ?? string.Empty;
+        var submittedValue = string.Empty;
+        var hasValue = !string.IsNullOrWhiteSpace(key) && submissionAnswers.TryGetValue(key, out submittedValue);
+        submittedValue ??= string.Empty;
+        var expected = rule.Value ?? string.Empty;
+
+        return rule.Operator switch
         {
-            DummyFormConditionOperator.Equals => string.Equals(submittedValue, expected, StringComparison.OrdinalIgnoreCase),
-            DummyFormConditionOperator.NotEquals => !string.Equals(submittedValue, expected, StringComparison.OrdinalIgnoreCase),
-            DummyFormConditionOperator.Contains => submittedValue.Contains(expected, StringComparison.OrdinalIgnoreCase),
-            DummyFormConditionOperator.IsEmpty => !hasValue || string.IsNullOrWhiteSpace(submittedValue),
-            DummyFormConditionOperator.IsNotEmpty => hasValue && !string.IsNullOrWhiteSpace(submittedValue),
+            DummyQuestionRuleOperator.Equals => string.Equals(submittedValue, expected, StringComparison.OrdinalIgnoreCase),
+            DummyQuestionRuleOperator.NotEquals => !string.Equals(submittedValue, expected, StringComparison.OrdinalIgnoreCase),
+            DummyQuestionRuleOperator.Contains => submittedValue.Contains(expected, StringComparison.OrdinalIgnoreCase),
+            DummyQuestionRuleOperator.IsEmpty => !hasValue || string.IsNullOrWhiteSpace(submittedValue),
+            DummyQuestionRuleOperator.IsNotEmpty => hasValue && !string.IsNullOrWhiteSpace(submittedValue),
             _ => false
         };
+    }
+
+    private static int IndexOf(IList<DummyQuestionElementBlock> questions, ContentReference element)
+    {
+        for (var index = 0; index < questions.Count; index++)
+        {
+            if (SameContent(GetContentLink(questions[index]), element))
+            {
+                return index;
+            }
+        }
+
+        return -1;
     }
 
     private static bool SameContent(ContentReference left, ContentReference right)
@@ -92,5 +114,10 @@ public class DummyFormBranchEvaluator : IDummyFormBranchEvaluator
             && !ContentReference.IsNullOrEmpty(right)
             && left.ID == right.ID
             && left.ProviderName == right.ProviderName;
+    }
+
+    private static ContentReference GetContentLink(IContentData contentData)
+    {
+        return contentData is IContent content ? content.ContentLink : ContentReference.EmptyReference;
     }
 }

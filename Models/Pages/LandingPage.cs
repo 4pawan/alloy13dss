@@ -21,7 +21,7 @@ public class LandingPage : SitePageData
     {
         base.SetDefaultValues(contentType);
 
-        HideSiteFooter = true;
-        HideSiteHeader = true;
+        HideSiteFooter = false;
+        HideSiteHeader = false;
     }
 }

@@ -1,0 +1,102 @@
+@using alloy13dss.Models.Forms
+@using EPiServer.Forms.Helpers.Internal
+@using EPiServer.Web
+@using EPiServer.Web.Mvc.Html
+
+@model DummyFormContainerViewModel
+
+@if (Context.Request.Query.ContainsKey("epieditmode") || Context.Request.Query.ContainsKey("epieditmodeuri"))
+{
+    <div class="EPiServerForms form-editing-wrapper">
+        <h2 class="Form__Title">@Html.PropertyFor(m => m.Form.Title)</h2>
+        <div class="Form__Description">@Html.PropertyFor(m => m.Form.Description)</div>
+        @Html.PropertyFor(m => m.Form.ElementsArea, new { Tag = "" })
+    </div>
+}
+else
+{
+    var formGuid = Model.Form.Form?.FormGuid.ToString() ?? $"dummy-form-{Model.SubmissionId:N}";
+    var formTitleId = $"{formGuid}_label";
+
+    <form method="post"
+          action="@Url.Action("Submit", "DummyFormContainerBlock")"
+          enctype="multipart/form-data"
+          novalidate="novalidate"
+          data-f-metadata="@Model.Form.MetadataAttribute"
+          aria-labelledby="@formTitleId"
+          class="EPiServerForms DummyFormContainerBlock"
+          data-f-type="form"
+          data-dummy-form
+          data-dummy-recaptcha-site-key="@Model.Form.RecaptchaSiteKey"
+          data-dummy-recaptcha-action="dummy_form_step"
+          id="@formGuid">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="FormContentLink" value="@Model.FormContentLink" />
+        <input type="hidden" name="SubmissionId" value="@Model.SubmissionId" />
+        <input type="hidden" name="CurrentElementLink" value="@Model.ActiveElementLink" />
+        <input type="hidden" name="ReturnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+        <input type="hidden" name="RecaptchaToken" value="" data-dummy-recaptcha-token />
+
+        <input type="hidden" class="Form__Element Form__SystemElement FormHidden FormHideInSummarized" name="__FormGuid" value="@formGuid" data-f-type="hidden" />
+        <input type="hidden" class="Form__Element Form__SystemElement FormHidden FormHideInSummarized" name="__FormHostedPage" value="@FormsExtensions.GetCurrentPageLink()?.ToString()" data-f-type="hidden" />
+        <input type="hidden" class="Form__Element Form__SystemElement FormHidden FormHideInSummarized" name="__FormLanguage" value="@FormsExtensions.GetCurrentFormLanguage(Model.Form)" data-f-type="hidden" />
+        <input type="hidden" class="Form__Element Form__SystemElement FormHidden FormHideInSummarized" name="__FormSubmissionId" value="@Model.SubmissionId" data-f-type="hidden" />
+
+        @if (!string.IsNullOrEmpty(Model.Form.Title))
+        {
+            <h2 class="Form__Title" id="@formTitleId">@Model.Form.Title</h2>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.Form.Description))
+        {
+            <aside class="Form__Description">@Model.Form.Description</aside>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Message))
+        {
+            <div class="Form__Status">
+                <div role="status" class="Form__Warning__Message">@Model.Message</div>
+            </div>
+        }
+
+        <div data-f-mainbody class="Form__MainBody">
+            @if (Model.IsComplete)
+            {
+                <div class="Form__Success">
+                    <div role="status" class="Form__SubmissionSuccess__Message Form__Success__Message">
+                        @{
+                            Html.RenderFormXhtmlString(Model.Form.SubmitSuccessMessage);
+                        }
+                    </div>
+                </div>
+            }
+            else if (Model.ActiveElement != null)
+            {
+                <section data-f-type="step" class="Form__Element FormStep">
+                    @{
+                        Html.RenderContentData(Model.ActiveElement, false);
+                    }
+
+                    <input type="hidden" name="CurrentValue" data-dummy-current-value />
+                </section>
+
+                <nav role="navigation" class="Form__NavigationBar" data-f-type="navigationbar">
+                    <button type="submit" name="Command" value="previous" class="Form__NavigationBar__Action btnPrev" disabled="@(!Model.CanGoBack ? "disabled" : null)">
+                        Previous
+                    </button>
+                    <button type="submit" name="Command" value="next" class="Form__NavigationBar__Action btnNext">
+                        Next
+                    </button>
+                </nav>
+            }
+        </div>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Form.RecaptchaSiteKey))
+    {
+        <script src="https://www.google.com/recaptcha/api.js?render=@Model.Form.RecaptchaSiteKey"></script>
+    }
+
+    <script src="~/js/maintool.js"></script>
+}

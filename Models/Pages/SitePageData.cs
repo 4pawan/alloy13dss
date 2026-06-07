@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using alloy13dss.Business.Rendering;
+using alloy13dss.Models.Forms;
 using EPiServer.SpecializedProperties;
 using EPiServer.Web;
 
@@ -84,6 +85,29 @@ public abstract class SitePageData : PageData, ICustomCssInContentArea
         Order = 300)]
     [CultureSpecific]
     public virtual bool HideSiteFooter { get; set; }
+
+    [Display(
+        Name = "Settings page",
+        Description = "Optional settings source for reusable form tools.",
+        GroupName = SystemTabNames.Settings,
+        Order = 400)]
+    [AllowedTypes(typeof(SettingsPage))]
+    public virtual ContentReference SettingsPageLink { get; set; }
+
+    [Display(
+        Name = "Form tool key",
+        Description = "Key of the tool definition on the selected settings page.",
+        GroupName = SystemTabNames.Settings,
+        Order = 410)]
+    public virtual string FormToolKey { get; set; }
+
+    [Display(
+        Name = "Direct form container block",
+        Description = "Optional page-level override. If set, this block is used instead of the settings page tool key.",
+        GroupName = SystemTabNames.Settings,
+        Order = 420)]
+    [AllowedTypes(typeof(DummyFormContainerBlock))]
+    public virtual ContentReference DirectFormContainerBlock { get; set; }
 
     public string ContentAreaCssClass => "teaserblock";
 }

@@ -20,6 +20,7 @@ namespace alloy13dss.Models.Pages;
         typeof(StandardPage),
         typeof(ISearchPage),
         typeof(LandingPage),
+        typeof(SettingsPage),
         typeof(ContentFolder)
     ], // Pages we can create under the start page...
     ExcludeOn =
@@ -28,7 +29,8 @@ namespace alloy13dss.Models.Pages;
         typeof(ProductPage),
         typeof(StandardPage),
         typeof(ISearchPage),
-        typeof(LandingPage)
+        typeof(LandingPage),
+        typeof(SettingsPage)
     ])] // ...and underneath those we can't create additional start pages
 public class StartPage : SitePageData
 {

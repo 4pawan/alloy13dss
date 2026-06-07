@@ -16,7 +16,7 @@ public class TemplateCoordinator : IViewTemplateModelRegistrator
     public static void OnTemplateResolved(object sender, TemplateResolverEventArgs args)
     {
         // Disable DefaultPageController for page types that shouldn't have any renderer as pages
-        if (args.ItemToRender is IContainerPage &&
+        if ((args.ItemToRender is IContainerPage || args.ItemToRender is SettingsPage) &&
             args.SelectedTemplate != null &&
             args.SelectedTemplate.TemplateType == typeof(DefaultPageController))
         {

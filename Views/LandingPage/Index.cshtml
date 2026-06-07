@@ -1,5 +1,34 @@
 @model PageViewModel<LandingPage>
+@using alloy13dss.Business.Forms
+@using EPiServer.ServiceLocation
 
-<div class="campaign-wrapper">
-    <div epi-property="@Model.CurrentPage.MainContentArea" class="row" />
-</div>
+@{
+    Layout = "~/Views/Shared/Layouts/_DummyToolLayout.cshtml";
+    var toolResolver = ServiceLocator.Current.GetInstance<IFormToolResolver>();
+    var formTool = toolResolver.Resolve(Model.CurrentPage);
+}
+
+<section class="dummy-theme__hero">
+    <div class="dummy-theme__eyebrow">Landing page</div>
+    <h1 class="dummy-theme__title" epi-property="@Model.CurrentPage.Name">@Model.CurrentPage.Name</h1>
+    <p class="dummy-theme__lead" epi-property="@Model.CurrentPage.MetaDescription">@Model.CurrentPage.MetaDescription</p>
+</section>
+
+<section class="dummy-theme__grid">
+    <div>
+        <div epi-property="@Model.CurrentPage.MainContentArea" class="row">
+            <div epi-property-item class="block" />
+        </div>
+    </div>
+
+    <aside class="dummy-theme__tool">
+        @if (formTool != null)
+        {
+            Html.RenderContentData(formTool, false);
+        }
+        else
+        {
+            <div>Select a direct form container block or configure a form tool key from a settings page.</div>
+        }
+    </aside>
+</section>

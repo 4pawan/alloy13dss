@@ -6,7 +6,7 @@ namespace alloy13dss.Models.Forms;
 [ContentType(
     DisplayName = "Dummy reCAPTCHA v3",
     Description = "Hidden per-step captcha token element for dummy form journeys.",
-    GUID = "64287e78-1d68-4a8c-9f02-33647b81daaf",
+    GUID = "64287E78-1D68-4A8C-9F02-33647B81DAAF",
     GroupName = "Forms")]
 [SiteImageUrl]
 public class DummyRecaptchaV3ElementBlock : PredefinedHiddenElementBlock
