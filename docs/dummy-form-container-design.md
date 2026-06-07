@@ -1,12 +1,13 @@
 # Dummy Form Container Design
 
-`DummyFormContainerBlock` extends Optimizely Forms instead of replacing it. Normal Forms elements still own rendering, validation, and submission storage. The custom layer decides which `DummyQuestionElementBlock` is currently active, validates reCAPTCHA v3 for each step, and persists journey navigation state in DDS.
+`DummyFormContainerBlock` extends Optimizely Forms instead of replacing it. Normal Forms elements still own rendering, validation, and submission storage. The custom layer decides which `DummyQuestionElementBlock` is currently active, validates reCAPTCHA v3 for each step from `SettingsPage`, and persists journey navigation state in DDS.
 
 ## Content Model
 
 - `DummyFormContainerBlock : FormContainerBlock`
 - `DummyQuestionElementBlock : TextboxElementBlock`
 - `DummyRecaptchaV3ElementBlock : HiddenElementBlock`
+- `SettingsPage` stores the shared reCAPTCHA v3 site key, secret key, and score threshold.
 
 Editors add `DummyQuestionElementBlock` items directly to the form's normal elements area:
 
@@ -38,7 +39,7 @@ The submission id is the resume key. The state record tracks visited elements so
 1. First render shows the first `DummyQuestionElementBlock` in the Forms elements area.
 2. User submits the current question.
 3. Validate the current visible Forms element using the built-in Forms validation pipeline.
-4. Validate reCAPTCHA v3 on every step.
+4. Validate reCAPTCHA v3 on every step using the page's selected `SettingsPage`.
 5. Save the current question value into the Forms submission or answer store.
 6. If the current question has `AlwaysRedirectToSourceKey`, redirect to that question.
 7. Otherwise scan the next `DummyQuestionElementBlock` items in order.

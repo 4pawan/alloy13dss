@@ -4,6 +4,8 @@ public class DummyFormJourneyPostModel
 {
     public ContentReference FormContentLink { get; set; }
 
+    public ContentReference SettingsPageLink { get; set; }
+
     public Guid SubmissionId { get; set; }
 
     public ContentReference CurrentElementLink { get; set; }

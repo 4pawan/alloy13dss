@@ -27,12 +27,13 @@ else
           class="EPiServerForms DummyFormContainerBlock"
           data-f-type="form"
           data-dummy-form
-          data-dummy-recaptcha-site-key="@Model.Form.RecaptchaSiteKey"
+          data-dummy-recaptcha-site-key="@Model.RecaptchaSiteKey"
           data-dummy-recaptcha-action="dummy_form_step"
           id="@formGuid">
         @Html.AntiForgeryToken()
 
         <input type="hidden" name="FormContentLink" value="@Model.FormContentLink" />
+        <input type="hidden" name="SettingsPageLink" value="@Model.SettingsPageLink" />
         <input type="hidden" name="SubmissionId" value="@Model.SubmissionId" />
         <input type="hidden" name="CurrentElementLink" value="@Model.ActiveElementLink" />
         <input type="hidden" name="ReturnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
@@ -93,9 +94,9 @@ else
         </div>
     </form>
 
-    @if (!string.IsNullOrWhiteSpace(Model.Form.RecaptchaSiteKey))
+    @if (!string.IsNullOrWhiteSpace(Model.RecaptchaSiteKey))
     {
-        <script src="https://www.google.com/recaptcha/api.js?render=@Model.Form.RecaptchaSiteKey"></script>
+        <script src="https://www.google.com/recaptcha/api.js?render=@Model.RecaptchaSiteKey"></script>
     }
 
     <script src="~/js/maintool.js"></script>

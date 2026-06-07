@@ -42,11 +42,7 @@ This block extends `FormContainerBlock`.
 
 It does not own journey rules directly anymore. The ordering comes from the standard Forms `ElementsArea`.
 
-It only adds:
-
-- `RecaptchaSiteKey`
-- `RecaptchaSecretKey`
-- `RecaptchaScoreThreshold`
+It does not own reCAPTCHA settings. Those live on `SettingsPage` so the same tool can be reused without copying integration keys onto every form container.
 
 ### DummyQuestionElementBlock
 
@@ -127,7 +123,7 @@ On submit:
 
 1. Resolve the current form and journey state.
 2. Handle Previous if requested.
-3. Validate reCAPTCHA v3.
+3. Load the posted `SettingsPageLink` and validate reCAPTCHA v3 from those settings.
 4. Save the submitted answer.
 5. Ask `DummyFormBranchEvaluator.ResolveNextElement` for the next visible question.
 6. Update DDS state.
@@ -198,6 +194,7 @@ In view mode:
 
 - Renders one active element only.
 - Posts hidden journey fields.
+- Posts the resolved `SettingsPageLink` so the next submission can validate reCAPTCHA server-side.
 - Posts standard Forms hidden fields.
 - Captures the active input value into `CurrentValue`.
 - Executes reCAPTCHA v3 when configured.
@@ -214,6 +211,9 @@ CMS-only settings page. It has no view.
 
 It holds:
 
+- `RecaptchaSiteKey`
+- `RecaptchaSecretKey`
+- `RecaptchaScoreThreshold`
 - `FormTools`: content area of `FormToolSettingsBlock`
 
 ### FormToolSettingsBlock
@@ -240,8 +240,10 @@ Resolves the form tool for a page:
 
 ## CMS Setup Example
 
-1. Create a `DummyFormContainerBlock`.
-2. In the normal Forms elements area, add:
+1. Create a `SettingsPage`.
+2. Add reCAPTCHA v3 keys and score threshold on that SettingsPage.
+3. Create a `DummyFormContainerBlock`.
+4. In the normal Forms elements area, add:
 
 ```text
 Q1 DummyQuestionElementBlock

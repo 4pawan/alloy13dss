@@ -9,6 +9,10 @@ public class DummyFormContainerViewModel
 
     public ContentReference FormContentLink { get; set; }
 
+    public ContentReference SettingsPageLink { get; set; }
+
+    public string RecaptchaSiteKey { get; set; }
+
     public ElementBlockBase ActiveElement { get; set; }
 
     public Guid SubmissionId { get; set; }

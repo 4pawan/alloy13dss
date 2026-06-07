@@ -1,6 +1,8 @@
 using alloy13dss.Models.Forms;
+using alloy13dss.Models.Pages;
 using alloy13dss.Models.ViewModels;
 using EPiServer.Forms.Core;
+using EPiServer.Web.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace alloy13dss.Business.Forms;
@@ -10,17 +12,21 @@ public class DummyFormJourneyService(
     IDummyFormJourneyStateRepository stateRepository,
     IDummyFormBranchEvaluator branchEvaluator,
     IDummyFormSubmissionAnswerStore answerStore,
-    IRecaptchaV3Verifier recaptchaVerifier) : IDummyFormJourneyService
+    IRecaptchaV3Verifier recaptchaVerifier,
+    IPageRouteHelper pageRouteHelper) : IDummyFormJourneyService
 {
     public DummyFormContainerViewModel BuildViewModel(DummyFormContainerBlock form, Guid submissionId, ITempDataDictionary tempData)
     {
         var state = ResolveState(form, submissionId);
         var activeElement = ResolveActiveElement(state);
+        var settingsPage = ResolveCurrentSettingsPage();
 
         return new DummyFormContainerViewModel
         {
             Form = form,
             FormContentLink = GetContentLink(form),
+            SettingsPageLink = settingsPage?.ContentLink ?? ContentReference.EmptyReference,
+            RecaptchaSiteKey = settingsPage?.RecaptchaSiteKey,
             ActiveElement = activeElement,
             ActiveElementLink = GetContentLink(activeElement),
             SubmissionId = state.SubmissionId,
@@ -53,7 +59,7 @@ public class DummyFormJourneyService(
             return new DummyFormJourneyResult { IsValid = true, SubmissionId = state.SubmissionId };
         }
 
-        if (!await IsCaptchaValid(form, postModel.RecaptchaToken))
+        if (!await IsCaptchaValid(ResolveSettingsPage(postModel.SettingsPageLink), postModel.RecaptchaToken))
         {
             tempData["DummyFormJourneyMessage"] = "Captcha validation failed.";
             return new DummyFormJourneyResult { IsValid = true, SubmissionId = state.SubmissionId };
@@ -120,18 +126,33 @@ public class DummyFormJourneyService(
             : null;
     }
 
-    private async Task<bool> IsCaptchaValid(DummyFormContainerBlock form, string token)
+    private SettingsPage ResolveCurrentSettingsPage()
     {
-        if (string.IsNullOrWhiteSpace(form.RecaptchaSecretKey))
+        return pageRouteHelper.Page is SitePageData sitePage
+            ? ResolveSettingsPage(sitePage.SettingsPageLink)
+            : null;
+    }
+
+    private SettingsPage ResolveSettingsPage(ContentReference settingsPageLink)
+    {
+        return !ContentReference.IsNullOrEmpty(settingsPageLink) &&
+            contentLoader.TryGet(settingsPageLink, out SettingsPage settingsPage)
+                ? settingsPage
+                : null;
+    }
+
+    private async Task<bool> IsCaptchaValid(SettingsPage settingsPage, string token)
+    {
+        if (string.IsNullOrWhiteSpace(settingsPage?.RecaptchaSecretKey))
         {
             return true;
         }
 
         return await recaptchaVerifier.VerifyAsync(
-            form.RecaptchaSecretKey,
+            settingsPage.RecaptchaSecretKey,
             token,
             "dummy_form_step",
-            form.RecaptchaScoreThreshold);
+            settingsPage.RecaptchaScoreThreshold);
     }
 
     private void MovePrevious(DummyFormJourneyState state)
