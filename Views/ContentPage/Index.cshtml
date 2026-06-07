@@ -1,0 +1,19 @@
+@model PageViewModel<ContentPage>
+
+@{
+    Layout = "~/Views/Shared/Layouts/_DummyToolLayout.cshtml";
+}
+
+<section class="dummy-theme__hero">
+    <div class="dummy-theme__eyebrow">Content page</div>
+    <h1 class="dummy-theme__title" epi-property="@Model.CurrentPage.Name">@Model.CurrentPage.Name</h1>
+    <p class="dummy-theme__lead" epi-property="@Model.CurrentPage.MetaDescription">@Model.CurrentPage.MetaDescription</p>
+</section>
+
+<section class="dummy-theme__grid">
+    <div>
+        <div epi-property="@Model.CurrentPage.ContentArea" class="row">
+            <div epi-property-item class="block" />
+        </div>
+    </div>
+</section>
