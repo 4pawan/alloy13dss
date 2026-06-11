@@ -7,6 +7,7 @@
     Layout = null;
     var dummyToolSettingsResolver = ServiceLocator.Current.GetInstance<IDummyToolSettingsResolver>();
     var dummySettingsPage = dummyToolSettingsResolver.Resolve(Model.CurrentPage.ContentLink);
+    var bodyToolCode = dummySettingsPage?.ToolCode.ToBodyAttributeValue();
 }
 
 <!DOCTYPE html>
@@ -37,7 +38,7 @@
     }
 </head>
 
-<body>
+<body data-tool-code="@bodyToolCode">
     @if (Model.Layout?.IsInReadonlyMode == true)
     {
         await Html.RenderPartialAsync("Readonly", Model);

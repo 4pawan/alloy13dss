@@ -15,6 +15,13 @@ namespace alloy13dss.Models.Pages;
 public class SettingsPage : SitePageData
 {
     [Display(
+        Name = "Tool code",
+        Description = "Tool code used by shared dummy tool rendering and integrations.",
+        GroupName = SystemTabNames.Content,
+        Order = 70)]
+    public virtual DummyToolCode ToolCode { get; set; }
+
+    [Display(
         Name = "reCAPTCHA v3 site key",
         Description = "Public site key used by dummy form journeys.",
         GroupName = SystemTabNames.Content,
@@ -65,5 +72,22 @@ public class SettingsPage : SitePageData
         base.SetDefaultValues(contentType);
 
         RecaptchaScoreThreshold = 0.5;
+    }
+}
+
+public enum DummyToolCode
+{
+    None = 0,
+    ABC = 10,
+    XYZ = 20
+}
+
+public static class DummyToolCodeExtensions
+{
+    public static string ToBodyAttributeValue(this DummyToolCode toolCode)
+    {
+        return toolCode == DummyToolCode.None
+            ? null
+            : toolCode.ToString();
     }
 }
