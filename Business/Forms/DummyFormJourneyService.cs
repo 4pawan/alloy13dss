@@ -2,7 +2,6 @@ using alloy13dss.Models.Forms;
 using alloy13dss.Models.Pages;
 using alloy13dss.Models.ViewModels;
 using EPiServer.Forms.Core;
-using EPiServer.Web.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace alloy13dss.Business.Forms;
@@ -13,8 +12,7 @@ public class DummyFormJourneyService(
     IDummyFormBranchEvaluator branchEvaluator,
     IDummyFormSubmissionAnswerStore answerStore,
     IRecaptchaV3Verifier recaptchaVerifier,
-    IDummyToolSettingsResolver dummyToolSettingsResolver,
-    IPageRouteHelper pageRouteHelper) : IDummyFormJourneyService
+    IDummyToolSettingsResolver dummyToolSettingsResolver) : IDummyFormJourneyService
 {
     public DummyFormContainerViewModel BuildViewModel(DummyFormContainerBlock form, Guid submissionId, ITempDataDictionary tempData)
     {
@@ -155,9 +153,7 @@ public class DummyFormJourneyService(
 
     private SettingsPage ResolveCurrentSettingsPage()
     {
-        return pageRouteHelper.Page is DummySitePageData dummyPage
-            ? dummyToolSettingsResolver.Resolve(dummyPage)
-            : null;
+        return dummyToolSettingsResolver.Resolve();
     }
 
     private SettingsPage ResolveSettingsPage(ContentReference settingsPageLink)
