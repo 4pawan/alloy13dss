@@ -151,20 +151,24 @@ public class DummyFormJourneyService(
         return activeElement?.Label;
     }
 
-    private SettingsPage ResolveCurrentSettingsPage()
+    private IDummySettingsPage ResolveCurrentSettingsPage()
     {
         return dummyToolSettingsResolver.Resolve();
     }
 
-    private SettingsPage ResolveSettingsPage(ContentReference settingsPageLink)
+    private IDummySettingsPage ResolveSettingsPage(ContentReference settingsPageLink)
     {
-        return !ContentReference.IsNullOrEmpty(settingsPageLink) &&
-            contentLoader.TryGet(settingsPageLink, out SettingsPage settingsPage)
-                ? settingsPage
-                : null;
+        if (ContentReference.IsNullOrEmpty(settingsPageLink) ||
+            !contentLoader.TryGet(settingsPageLink, out IContent content) ||
+            content is not IDummySettingsPage settingsPage)
+        {
+            return null;
+        }
+
+        return settingsPage;
     }
 
-    private async Task<bool> IsCaptchaValid(SettingsPage settingsPage, string token)
+    private async Task<bool> IsCaptchaValid(IDummySettingsPage settingsPage, string token)
     {
         if (string.IsNullOrWhiteSpace(settingsPage?.RecaptchaSecretKey))
         {

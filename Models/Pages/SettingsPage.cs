@@ -12,14 +12,21 @@ namespace alloy13dss.Models.Pages;
     GroupName = Globals.GroupNames.Specialized)]
 [SiteImageUrl]
 [AvailableContentTypes(Availability.None)]
-public class SettingsPage : SitePageData
+public class SettingsPage : SitePageData, IDummySettingsPage
 {
     [Display(
         Name = "Tool code",
         Description = "Tool code used by shared dummy tool rendering and integrations.",
         GroupName = SystemTabNames.Content,
         Order = 70)]
-    public virtual DummyToolCode ToolCode { get; set; }
+    public virtual string ToolCode { get; set; }
+
+    [Display(
+        Name = "Tool text",
+        Description = "Tool text used by shared dummy tool rendering and integrations.",
+        GroupName = SystemTabNames.Content,
+        Order = 75)]
+    public virtual string ToolText { get; set; }
 
     [Display(
         Name = "reCAPTCHA v3 site key",
@@ -75,19 +82,21 @@ public class SettingsPage : SitePageData
     }
 }
 
-public enum DummyToolCode
+public interface IDummySettingsPage : IContent
 {
-    None = 0,
-    ABC = 10,
-    XYZ = 20
-}
+    string ToolCode { get; }
 
-public static class DummyToolCodeExtensions
-{
-    public static string ToBodyAttributeValue(this DummyToolCode toolCode)
-    {
-        return toolCode == DummyToolCode.None
-            ? null
-            : toolCode.ToString();
-    }
+    string ToolText { get; }
+
+    string RecaptchaSiteKey { get; }
+
+    string RecaptchaSecretKey { get; }
+
+    double RecaptchaScoreThreshold { get; }
+
+    ContentArea FormTools { get; }
+
+    LinkItemCollection FooterLinks { get; }
+
+    string GtmScript { get; }
 }

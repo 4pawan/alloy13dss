@@ -11,19 +11,19 @@ public class DummyToolSettingsResolver(
 {
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
 
-    public SettingsPage Resolve()
+    public IDummySettingsPage Resolve()
     {
         return routeHelper.Page is IContent page
             ? ResolveFromCachedSettingsLink(page)
             : null;
     }
 
-    public SettingsPage Resolve(DummySitePageData page)
+    public IDummySettingsPage Resolve(DummySitePageData page)
     {
         return page == null ? null : ResolveFromCachedSettingsLink(page);
     }
 
-    public SettingsPage Resolve(ContentReference contentLink)
+    public IDummySettingsPage Resolve(ContentReference contentLink)
     {
         if (ContentReference.IsNullOrEmpty(contentLink) ||
             !contentLoader.TryGet(contentLink, out IContent content))
@@ -34,7 +34,7 @@ public class DummyToolSettingsResolver(
         return ResolveFromCachedSettingsLink(content);
     }
 
-    private SettingsPage ResolveFromCachedSettingsLink(IContent content)
+    private IDummySettingsPage ResolveFromCachedSettingsLink(IContent content)
     {
         var settingsPageLink = memoryCache.GetOrCreate(
             BuildCacheKey(content),
@@ -80,12 +80,19 @@ public class DummyToolSettingsResolver(
         return null;
     }
 
-    private bool TryResolveSettingsPage(ContentReference settingsPageLink, out SettingsPage settingsPage)
+    private bool TryResolveSettingsPage(ContentReference settingsPageLink, out IDummySettingsPage settingsPage)
     {
         settingsPage = null;
 
-        return !ContentReference.IsNullOrEmpty(settingsPageLink) &&
-            contentLoader.TryGet(settingsPageLink, out settingsPage);
+        if (ContentReference.IsNullOrEmpty(settingsPageLink) ||
+            !contentLoader.TryGet(settingsPageLink, out IContent content) ||
+            content is not IDummySettingsPage dummySettingsPage)
+        {
+            return false;
+        }
+
+        settingsPage = dummySettingsPage;
+        return true;
     }
 
     private static string BuildCacheKey(IContent content)

@@ -7,7 +7,7 @@
     Layout = null;
     var dummyToolSettingsResolver = ServiceLocator.Current.GetInstance<IDummyToolSettingsResolver>();
     var dummySettingsPage = dummyToolSettingsResolver.Resolve(Model.CurrentPage.ContentLink);
-    var bodyToolCode = dummySettingsPage?.ToolCode.ToBodyAttributeValue();
+    var bodyToolCode = dummySettingsPage?.ToolCode;
 }
 
 <!DOCTYPE html>
